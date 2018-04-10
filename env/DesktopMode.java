@@ -43,10 +43,10 @@ public class DesktopMode implements RuntimeMode {
     public void launchDesktopApplication() {
         Logger.logInfoMessage("Launching desktop wallet");
         try {
-            desktopApplication = Class.forName("nxtdesktop.DesktopApplication");
+            desktopApplication = Class.forName("nxt.desktop.DesktopApplication");
             desktopApplication.getMethod("launch").invoke(null);
         } catch (ReflectiveOperationException e) {
-            Logger.logInfoMessage("nxtdesktop.DesktopApplication failed to launch", e);
+            Logger.logInfoMessage("nxt.desktop.DesktopApplication failed to launch", e);
         }
     }
 
@@ -59,7 +59,7 @@ public class DesktopMode implements RuntimeMode {
         try {
             desktopApplication.getMethod("shutdown").invoke(null);
         } catch (ReflectiveOperationException e) {
-            Logger.logInfoMessage("nxtdesktop.DesktopApplication failed to shutdown", e);
+            Logger.logInfoMessage("nxt.desktop.DesktopApplication failed to shutdown", e);
         }
     }
 

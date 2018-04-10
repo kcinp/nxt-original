@@ -34,7 +34,7 @@ public final class RemoveKnownPeer extends UserServlet.UserRequestHandler {
     @Override
     JSONStreamAware processRequest(HttpServletRequest req, User user) throws IOException {
         if (Users.allowedUserHosts == null && ! InetAddress.getByName(req.getRemoteAddr()).isLoopbackAddress()) {
-            return LOCAL_USERS_ONLY;
+            return JSONResponses.LOCAL_USERS_ONLY;
         } else {
             int index = Integer.parseInt(req.getParameter("peer"));
             Peer peer = Users.getPeer(index);

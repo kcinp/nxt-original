@@ -69,19 +69,19 @@ import java.util.stream.Stream;
  * the default schema (PUBLIC).
  *
  * The database aliases are defined as follows:
- *   CREATE ALIAS FTL_CREATE_INDEX FOR "nxt.db.FullTextTrigger.createIndex"
+ *   CREATE ALIAS FTL_CREATE_INDEX FOR "sharder.db.FullTextTrigger.createIndex"
  *       CALL FTL_CREATE(schema, table, columnList)
- *   CREATE ALIAS FTL_DROP_INDEX FOR "nxt.db.FullTextTrigger.dropIndex"
+ *   CREATE ALIAS FTL_DROP_INDEX FOR "sharder.db.FullTextTrigger.dropIndex"
  *       CALL FTL_DROP(schema, table)
- *   CREATE ALIAS FTL_SEARCH FOR "nxt.db.FullTextTrigger.search"
+ *   CREATE ALIAS FTL_SEARCH FOR "sharder.db.FullTextTrigger.search"
  *       CALL FTL_SEARCH(schema, table, query, limit, offset)
  *
  * FTL_CREATE_INDEX is called to create a fulltext index for a table.  It is
- * provided as a convenience for use in NxtDbVersion when creating a new index
+ * provided as a convenience for use in ConchDbVersion when creating a new index
  * after the database has been created.
  *
  * FTL_DROP_INDEX is called to drop a fulltext index for a table.  It is
- * provided as a convenience for use in NxtDbVersion when dropping a table
+ * provided as a convenience for use in ConchDbVersion when dropping a table
  * after the database has been created.
  *
  * FTL_SEARCH is used to return the search result set as part of a SELECT statement.
@@ -93,7 +93,7 @@ import java.util.stream.Stream;
  *   SCORE   - the search hit score (Float)
  *
  * The table index trigger is defined as follows:
- *   CREATE TRIGGER trigger_name AFTER INSERT,UPDATE,DELETE ON table_name FOR EACH ROW CALL "nxt.db.FullTextTrigger"
+ *   CREATE TRIGGER trigger_name AFTER INSERT,UPDATE,DELETE ON table_name FOR EACH ROW CALL "sharder.db.FullTextTrigger"
  */
 public class FullTextTrigger implements Trigger, TransactionalDb.TransactionCallback {
 
@@ -170,7 +170,7 @@ public class FullTextTrigger implements Trigger, TransactionalDb.TransactionCall
     /**
      * Initialize the fulltext support for a new database
      *
-     * This method should be called from NxtDbVersion when performing the database version update
+     * This method should be called from ConchDbVersion when performing the database version update
      * that enables NRS fulltext search support
      */
     public static void init() {
@@ -476,7 +476,7 @@ public class FullTextTrigger implements Trigger, TransactionalDb.TransactionCall
     public void init(Connection conn, String schema, String trigger, String table, boolean before, int type)
                                     throws SQLException {
         //
-        // Ignore the trigger if NRS is not active or this is a temporary table copy
+        // Ignore the trigger if Nxt is not active or this is a temporary table copy
         //
         if (!isActive || table.contains("_COPY_")) {
             return;
@@ -495,7 +495,7 @@ public class FullTextTrigger implements Trigger, TransactionalDb.TransactionCall
             //
             // Get the table column information
             //
-            // NRS tables use DB_ID as the primary index
+            // Nxt tables use DB_ID as the primary index
             //
             try (ResultSet rs = stmt.executeQuery("SHOW COLUMNS FROM " + table + " FROM " + schema)) {
                 int index = 0;
@@ -839,7 +839,7 @@ public class FullTextTrigger implements Trigger, TransactionalDb.TransactionCall
      */
     private static void getIndexAccess(Connection conn) throws SQLException {
         if (!isActive) {
-            throw new SQLException("NRS is no longer active");
+            throw new SQLException("DB is no longer active");
         }
         boolean obtainedUpdateLock = false;
         if (!indexLock.writeLock().hasLock()) {

@@ -63,10 +63,10 @@ public class CountingInputStream extends FilterInputStream {
         return count;
     }
 
-    private void incCount(long n) throws NxtException.NxtIOException {
+    private void incCount(long n) throws ConchException.NxtIOException {
         count += n;
         if (count > limit) {
-            throw new NxtException.NxtIOException("Maximum size exceeded: " + count);
+            throw new ConchException.NxtIOException("Maximum size exceeded: " + count);
         }
     }
 }

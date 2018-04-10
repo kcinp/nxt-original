@@ -17,6 +17,7 @@
 package nxt.user;
 
 import nxt.Token;
+import nxt.Token;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -35,7 +36,7 @@ public final class GenerateAuthorizationToken extends UserServlet.UserRequestHan
     JSONStreamAware processRequest(HttpServletRequest req, User user) throws IOException {
         String secretPhrase = req.getParameter("secretPhrase");
         if (! user.getSecretPhrase().equals(secretPhrase)) {
-            return INVALID_SECRET_PHRASE;
+            return JSONResponses.INVALID_SECRET_PHRASE;
         }
 
         String tokenString = Token.generateToken(secretPhrase, req.getParameter("website").trim());

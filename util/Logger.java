@@ -64,18 +64,18 @@ public final class Logger {
      *
      * The existing Java logging configuration will be used if the Java logger has already
      * been initialized.  Otherwise, we will configure our own log manager and log handlers.
-     * The nxt/conf/logging-default.properties and nxt/conf/logging.properties configuration
+     * The conf/logging-default.properties and conf/logging.properties configuration
      * files will be used.  Entries in logging.properties will override entries in
      * logging-default.properties.
      */
     static {
         String oldManager = System.getProperty("java.util.logging.manager");
         System.setProperty("java.util.logging.manager", "nxt.util.NxtLogManager");
-        if (!(LogManager.getLogManager() instanceof NxtLogManager)) {
+        if (!(LogManager.getLogManager() instanceof ConchLogManager)) {
             System.setProperty("java.util.logging.manager",
                     (oldManager != null ? oldManager : "java.util.logging.LogManager"));
         }
-        if (! Boolean.getBoolean("nxt.doNotConfigureLogging")) {
+        if (! Boolean.getBoolean("sharder.doNotConfigureLogging")) {
             try {
                 Properties loggingProperties = new Properties();
                 Nxt.loadProperties(loggingProperties, "logging-default.properties", true);
@@ -94,9 +94,9 @@ public final class Logger {
                 throw new RuntimeException("Error loading logging properties", e);
             }
         }
-        log = org.slf4j.LoggerFactory.getLogger(nxt.Nxt.class);
-        enableStackTraces = Nxt.getBooleanProperty("nxt.enableStackTraces");
-        enableLogTraceback = Nxt.getBooleanProperty("nxt.enableLogTraceback");
+        log = org.slf4j.LoggerFactory.getLogger(Nxt.class);
+        enableStackTraces = Nxt.getBooleanProperty("sharder.enableStackTraces");
+        enableLogTraceback = Nxt.getBooleanProperty("sharder.enableLogTraceback");
         logInfoMessage("logging enabled");
     }
 
@@ -109,8 +109,8 @@ public final class Logger {
      * Logger shutdown
      */
     public static void shutdown() {
-        if (LogManager.getLogManager() instanceof NxtLogManager) {
-            ((NxtLogManager) LogManager.getLogManager()).nxtShutdown();
+        if (LogManager.getLogManager() instanceof ConchLogManager) {
+            ((ConchLogManager) LogManager.getLogManager()).NxtShutdown();
         }
     }
 
@@ -201,7 +201,7 @@ public final class Logger {
     }
 
     public static void logShutdownMessage(String message) {
-        if (LogManager.getLogManager() instanceof NxtLogManager) {
+        if (LogManager.getLogManager() instanceof ConchLogManager) {
             logMessage(message);
         } else {
             System.out.println(message);
@@ -209,7 +209,7 @@ public final class Logger {
     }
 
     public static void logShutdownMessage(String message, Exception e) {
-        if (LogManager.getLogManager() instanceof NxtLogManager) {
+        if (LogManager.getLogManager() instanceof ConchLogManager) {
             logMessage(message, e);
         } else {
             System.out.println(message);

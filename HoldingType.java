@@ -18,7 +18,7 @@ package nxt;
 
 public enum HoldingType {
 
-    NXT((byte)0) {
+    SS((byte)0) {
 
         @Override
         public long getBalance(Account account, long holdingId) {

@@ -17,7 +17,6 @@
 package nxt.http;
 
 import nxt.NxtException;
-import nxt.http.APIServlet.APIRequestHandler;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
 import org.json.simple.JSONObject;
@@ -28,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.MISSING_PEER;
 import static nxt.http.JSONResponses.UNKNOWN_PEER;
 
-public class BlacklistPeer extends APIRequestHandler {
+public class BlacklistPeer extends APIServlet.APIRequestHandler {
 
     static final BlacklistPeer instance = new BlacklistPeer();
     
@@ -38,7 +37,7 @@ public class BlacklistPeer extends APIRequestHandler {
 
     @Override
     protected JSONStreamAware processRequest(HttpServletRequest request)
-            throws NxtException {
+            throws ConchException {
         JSONObject response = new JSONObject();
         
         String peerAddress = request.getParameter("peer");

@@ -35,7 +35,7 @@ public final class TransferAsset extends CreateTransaction {
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest req) throws ConchException {
 
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
 
@@ -46,7 +46,7 @@ public final class TransferAsset extends CreateTransaction {
         Attachment attachment = new Attachment.ColoredCoinsAssetTransfer(asset.getId(), quantityQNT);
         try {
             return createTransaction(req, account, recipient, 0, attachment);
-        } catch (NxtException.InsufficientBalanceException e) {
+        } catch (ConchException.InsufficientBalanceException e) {
             return NOT_ENOUGH_ASSETS;
         }
     }

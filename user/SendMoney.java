@@ -29,8 +29,6 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static nxt.user.JSONResponses.NOTIFY_OF_ACCEPTED_TRANSACTION;
-
 public final class SendMoney extends UserServlet.UserRequestHandler {
 
     static final SendMoney instance = new SendMoney();
@@ -38,14 +36,14 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
     private SendMoney() {}
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req, User user) throws NxtException.ValidationException, IOException {
+    JSONStreamAware processRequest(HttpServletRequest req, User user) throws ConchException.ValidationException, IOException {
         if (user.getSecretPhrase() == null) {
             return null;
         }
 
         String recipientValue = req.getParameter("recipient");
-        String amountValue = req.getParameter("amountNXT");
-        String feeValue = req.getParameter("feeNXT");
+        String amountValue = req.getParameter("amountSS");
+        String feeValue = req.getParameter("feeSS");
         String deadlineValue = req.getParameter("deadline");
         String secretPhrase = req.getParameter("secretPhrase");
 
@@ -58,8 +56,8 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
 
             recipient = Convert.parseUnsignedLong(recipientValue);
             if (recipient == 0) throw new IllegalArgumentException("invalid recipient");
-            amountNQT = Convert.parseNXT(amountValue.trim());
-            feeNQT = Convert.parseNXT(feeValue.trim());
+            amountNQT = Convert.parseSS(amountValue.trim());
+            feeNQT = Convert.parseSS(feeValue.trim());
             deadline = (short)(Double.parseDouble(deadlineValue) * 60);
 
         } catch (RuntimeException e) {
@@ -68,8 +66,8 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
             response.put("response", "notifyOfIncorrectTransaction");
             response.put("message", "One of the fields is filled incorrectly!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
@@ -81,8 +79,8 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
             response.put("response", "notifyOfIncorrectTransaction");
             response.put("message", "Wrong secret phrase!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
@@ -93,20 +91,20 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
             response.put("response", "notifyOfIncorrectTransaction");
             response.put("message", "\"Amount\" must be greater than 0!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
 
-        } else if (feeNQT < Constants.ONE_NXT || feeNQT > Constants.MAX_BALANCE_NQT) {
+        } else if (feeNQT < Constants.ONE_SS || feeNQT > Constants.MAX_BALANCE_NQT) {
 
             JSONObject response = new JSONObject();
             response.put("response", "notifyOfIncorrectTransaction");
-            response.put("message", "\"Fee\" must be at least 1 NXT!");
+            response.put("message", "\"Fee\" must be at least 1 SS!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
@@ -117,8 +115,8 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
             response.put("response", "notifyOfIncorrectTransaction");
             response.put("message", "\"Deadline\" must be greater or equal to 1 minute and less than 24 hours!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
@@ -132,8 +130,8 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
             response.put("response", "notifyOfIncorrectTransaction");
             response.put("message", "Not enough funds!");
             response.put("recipient", recipientValue);
-            response.put("amountNXT", amountValue);
-            response.put("feeNXT", feeValue);
+            response.put("amountSS", amountValue);
+            response.put("feeSS", feeValue);
             response.put("deadline", deadlineValue);
 
             return response;
@@ -145,7 +143,7 @@ public final class SendMoney extends UserServlet.UserRequestHandler {
 
             Nxt.getTransactionProcessor().broadcast(transaction);
 
-            return NOTIFY_OF_ACCEPTED_TRANSACTION;
+            return JSONResponses.NOTIFY_OF_ACCEPTED_TRANSACTION;
 
         }
     }

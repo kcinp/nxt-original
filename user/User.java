@@ -20,6 +20,7 @@ import nxt.Generator;
 import nxt.crypto.Crypto;
 import nxt.util.JSON;
 import nxt.util.Logger;
+import nxt.util.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;

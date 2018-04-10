@@ -16,9 +16,6 @@
 
 package nxt.crypto;
 
-import nxt.Nxt;
-import nxt.util.Convert;
-import nxt.util.Logger;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -29,6 +26,9 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jcajce.provider.digest.RIPEMD160;
+import nxt.Nxt;
+import nxt.util.Convert;
+import nxt.util.Logger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,7 +37,7 @@ import java.util.Arrays;
 
 public final class Crypto {
 
-    private static final boolean useStrongSecureRandom = Nxt.getBooleanProperty("nxt.useStrongSecureRandom");
+    private static final boolean useStrongSecureRandom = Nxt.getBooleanProperty("sharder.useStrongSecureRandom");
 
     private static final ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
         @Override

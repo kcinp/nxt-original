@@ -76,12 +76,12 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
     }
 
     final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, Attachment attachment)
-            throws NxtException {
+            throws ConchException {
         return createTransaction(req, senderAccount, 0, 0, attachment);
     }
 
     final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, long recipientId, long amountNQT)
-            throws NxtException {
+            throws ConchException {
         return createTransaction(req, senderAccount, recipientId, amountNQT, Attachment.ORDINARY_PAYMENT);
     }
 
@@ -132,7 +132,7 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
     }
 
     final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, long recipientId,
-                                            long amountNQT, Attachment attachment) throws NxtException {
+                                            long amountNQT, Attachment attachment) throws ConchException {
         String deadlineValue = req.getParameter("deadline");
         String referencedTransactionFullHash = Convert.emptyToNull(req.getParameter("referencedTransactionFullHash"));
         String secretPhrase = ParameterParser.getSecretPhrase(req, false);
@@ -228,7 +228,7 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
             response.put("transactionJSON", transactionJSON);
             try {
                 response.put("unsignedTransactionBytes", Convert.toHexString(transaction.getUnsignedBytes()));
-            } catch (NxtException.NotYetEncryptedException ignore) {}
+            } catch (ConchException.NotYetEncryptedException ignore) {}
             if (secretPhrase != null) {
                 response.put("transaction", transaction.getStringId());
                 response.put("fullHash", transactionJSON.get("fullHash"));
@@ -242,11 +242,11 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
                 transaction.validate();
                 response.put("broadcasted", false);
             }
-        } catch (NxtException.NotYetEnabledException e) {
+        } catch (ConchException.NotYetEnabledException e) {
             return FEATURE_NOT_AVAILABLE;
-        } catch (NxtException.InsufficientBalanceException e) {
+        } catch (ConchException.InsufficientBalanceException e) {
             throw e;
-        } catch (NxtException.ValidationException e) {
+        } catch (ConchException.ValidationException e) {
             if (broadcast) {
                 response.clear();
             }

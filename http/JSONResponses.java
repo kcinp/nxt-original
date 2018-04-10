@@ -120,7 +120,7 @@ public final class JSONResponses {
     public static final JSONStreamAware MISSING_OFFER = missing("offer");
     public static final JSONStreamAware UNKNOWN_OFFER = unknown("offer");
     public static final JSONStreamAware INCORRECT_OFFER = incorrect("offer");
-    public static final JSONStreamAware INCORRECT_ADMIN_PASSWORD = incorrect("adminPassword", "(the specified password does not match nxt.adminPassword)");
+    public static final JSONStreamAware INCORRECT_ADMIN_PASSWORD = incorrect("adminPassword", "(the specified password does not match sharder.adminPassword)");
     public static final JSONStreamAware LOCKED_ADMIN_PASSWORD = incorrect("adminPassword", "(locked for 1 hour, too many incorrect password attempts)");
     public static final JSONStreamAware OVERFLOW = error("overflow");
     public static final JSONStreamAware MISSING_SHUFFLING = missing("shuffling");
@@ -293,7 +293,7 @@ public final class JSONResponses {
     static {
         JSONObject response = new JSONObject();
         response.put("errorCode", 8);
-        response.put("errorDescription", "Administrator's password is not configured. Please set nxt.adminPassword");
+        response.put("errorDescription", "Administrator's password is not configured. Please set sharder.adminPassword");
         NO_PASSWORD_IN_CONFIG = JSON.prepare(response);
     }
 
@@ -301,7 +301,7 @@ public final class JSONResponses {
     static {
         JSONObject response = new JSONObject();
         response.put("errorCode", 8);
-        response.put("errorDescription", "Poll results no longer available, set nxt.processPolls=true and rescan");
+        response.put("errorDescription", "Poll results no longer available, set sharder.processPolls=true and rescan");
         POLL_RESULTS_NOT_AVAILABLE = JSON.prepare(response);
     }
 
@@ -485,7 +485,7 @@ public final class JSONResponses {
 
     static JSONStreamAware notEnoughHolding(HoldingType holdingType) {
         switch (holdingType) {
-            case NXT:
+            case SS:
                 return JSONResponses.NOT_ENOUGH_FUNDS;
             case ASSET:
                 return JSONResponses.NOT_ENOUGH_ASSETS;

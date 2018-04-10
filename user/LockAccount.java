@@ -34,6 +34,6 @@ public final class LockAccount extends UserServlet.UserRequestHandler {
 
         user.lockAccount();
 
-        return LOCK_ACCOUNT;
+        return JSONResponses.LOCK_ACCOUNT;
     }
 }

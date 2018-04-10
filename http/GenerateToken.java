@@ -18,6 +18,8 @@ package nxt.http;
 
 import nxt.Token;
 import nxt.util.Convert;
+import nxt.Token;
+import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 

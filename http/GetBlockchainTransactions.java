@@ -37,7 +37,7 @@ public final class GetBlockchainTransactions extends APIServlet.APIRequestHandle
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest req) throws ConchException {
 
         long accountId = ParameterParser.getAccountId(req, true);
         int timestamp = ParameterParser.getTimestamp(req);

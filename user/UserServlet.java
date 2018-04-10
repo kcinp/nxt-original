@@ -31,20 +31,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nxt.user.JSONResponses.DENY_ACCESS;
-import static nxt.user.JSONResponses.INCORRECT_REQUEST;
-import static nxt.user.JSONResponses.POST_REQUIRED;
-
 public final class UserServlet extends HttpServlet  {
 
     abstract static class UserRequestHandler {
-        abstract JSONStreamAware processRequest(HttpServletRequest request, User user) throws NxtException, IOException;
+        abstract JSONStreamAware processRequest(HttpServletRequest request, User user) throws ConchException, IOException;
         boolean requirePost() {
             return false;
         }
     }
 
-    private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.uiServerEnforcePOST");
+    private static final boolean enforcePost = Nxt.getBooleanProperty("sharder.uiServerEnforcePOST");
 
     private static final Map<String,UserRequestHandler> userRequestHandlers;
 
@@ -89,24 +85,24 @@ public final class UserServlet extends HttpServlet  {
             user = Users.getUser(userPasscode);
 
             if (Users.allowedUserHosts != null && ! Users.allowedUserHosts.contains(req.getRemoteHost())) {
-                user.enqueue(DENY_ACCESS);
+                user.enqueue(JSONResponses.DENY_ACCESS);
                 return;
             }
 
             String requestType = req.getParameter("requestType");
             if (requestType == null) {
-                user.enqueue(INCORRECT_REQUEST);
+                user.enqueue(JSONResponses.INCORRECT_REQUEST);
                 return;
             }
 
             UserRequestHandler userRequestHandler = userRequestHandlers.get(requestType);
             if (userRequestHandler == null) {
-                user.enqueue(INCORRECT_REQUEST);
+                user.enqueue(JSONResponses.INCORRECT_REQUEST);
                 return;
             }
 
             if (enforcePost && userRequestHandler.requirePost() && ! "POST".equals(req.getMethod())) {
-                user.enqueue(POST_REQUIRED);
+                user.enqueue(JSONResponses.POST_REQUIRED);
                 return;
             }
 
@@ -115,7 +111,7 @@ public final class UserServlet extends HttpServlet  {
                 user.enqueue(response);
             }
 
-        } catch (RuntimeException|NxtException e) {
+        } catch (RuntimeException|ConchException e) {
 
             Logger.logMessage("Error processing GET request", e);
             if (user != null) {

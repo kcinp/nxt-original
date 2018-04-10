@@ -33,8 +33,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static nxt.user.JSONResponses.LOCK_ACCOUNT;
-
 public final class UnlockAccount extends UserServlet.UserRequestHandler {
 
     static final UnlockAccount instance = new UnlockAccount();
@@ -63,7 +61,7 @@ public final class UnlockAccount extends UserServlet.UserRequestHandler {
             if (secretPhrase.equals(u.getSecretPhrase())) {
                 u.lockAccount();
                 if (! u.isInactive()) {
-                    u.enqueue(LOCK_ACCOUNT);
+                    u.enqueue(JSONResponses.LOCK_ACCOUNT);
                 }
             }
         });

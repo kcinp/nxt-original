@@ -47,10 +47,10 @@ public interface Peer extends Comparable<Peer> {
     }
 
     enum BlockchainState {
-        UP_TO_DATE,
-        DOWNLOADING,
-        LIGHT_CLIENT,
-        FORK
+        UP_TO_DATE, //最新的
+        DOWNLOADING, //下载中
+        LIGHT_CLIENT, //轻客户端
+        FORK //分叉
     }
 
     boolean providesService(Service service);

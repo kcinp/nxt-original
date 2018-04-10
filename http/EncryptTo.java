@@ -37,7 +37,7 @@ public final class EncryptTo extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest req) throws ConchException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         byte[] recipientPublicKey = Account.getPublicKey(recipientId);

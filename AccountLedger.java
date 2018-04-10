@@ -54,7 +54,7 @@ public class AccountLedger {
     private static final int logUnconfirmed;
 
     /** Number of blocks to keep when trimming */
-    public static final int trimKeep = Nxt.getIntProperty("nxt.ledgerTrimKeep", 30000);
+    public static final int trimKeep = Nxt.getIntProperty("sharder.ledgerTrimKeep", 30000);
 
     /** Blockchain */
     private static final Blockchain blockchain = Nxt.getBlockchain();
@@ -69,7 +69,7 @@ public class AccountLedger {
      * Process nxt.ledgerAccounts
      */
     static {
-        List<String> ledgerAccounts = Nxt.getStringListProperty("nxt.ledgerAccounts");
+        List<String> ledgerAccounts = Nxt.getStringListProperty("sharder.ledgerAccounts");
         ledgerEnabled = !ledgerAccounts.isEmpty();
         trackAllAccounts = ledgerAccounts.contains("*");
         if (ledgerEnabled) {
@@ -88,7 +88,7 @@ public class AccountLedger {
         } else {
             Logger.logInfoMessage("Account ledger is not enabled");
         }
-        int temp = Nxt.getIntProperty("nxt.ledgerLogUnconfirmed", 1);
+        int temp = Nxt.getIntProperty("sharder.ledgerLogUnconfirmed", 1);
         logUnconfirmed = (temp >= 0 && temp <= 2 ? temp : 1);
     }
 
@@ -521,8 +521,8 @@ public class AccountLedger {
      * they are stored in the holding_type field of the account_ledger table.
      */
     public enum LedgerHolding {
-        UNCONFIRMED_NXT_BALANCE(1, true),
-        NXT_BALANCE(2, false),
+        UNCONFIRMED_CONCH_BALANCE(1, true),
+        CONCH_BALANCE(2, false),
         UNCONFIRMED_ASSET_BALANCE(3, true),
         ASSET_BALANCE(4, false),
         UNCONFIRMED_CURRENCY_BALANCE(5, true),

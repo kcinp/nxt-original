@@ -100,7 +100,7 @@ public final class JSONData {
             json.put("unconfirmedBalanceNQT", "0");
             json.put("forgedBalanceNQT", "0");
             if (includeEffectiveBalance) {
-                json.put("effectiveBalanceNXT", "0");
+                json.put("effectiveBalanceSS", "0");
                 json.put("guaranteedBalanceNQT", "0");
             }
         } else {
@@ -108,7 +108,7 @@ public final class JSONData {
             json.put("unconfirmedBalanceNQT", String.valueOf(account.getUnconfirmedBalanceNQT()));
             json.put("forgedBalanceNQT", String.valueOf(account.getForgedBalanceNQT()));
             if (includeEffectiveBalance) {
-                json.put("effectiveBalanceNXT", account.getEffectiveBalanceNXT(height));
+                json.put("effectiveBalanceSS", account.getEffectiveBalanceSS(height));
                 json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT(Constants.GUARANTEED_BALANCE_CONFIRMATIONS, height)));
             }
         }
@@ -123,7 +123,7 @@ public final class JSONData {
             json.put("currentHeightFrom", String.valueOf(accountLease.getCurrentLeasingHeightFrom()));
             json.put("currentHeightTo", String.valueOf(accountLease.getCurrentLeasingHeightTo()));
             if (includeEffectiveBalance) {
-                json.put("effectiveBalanceNXT", String.valueOf(account.getGuaranteedBalanceNQT() / Constants.ONE_NXT));
+                json.put("effectiveBalanceSS", String.valueOf(account.getGuaranteedBalanceNQT() / Constants.ONE_SS));
             }
         }
         if (accountLease.getNextLesseeId() != 0) {
@@ -365,7 +365,7 @@ public final class JSONData {
         if (recipientPublicKeys.size() > 0) {
             json.put("recipientPublicKeys", recipientPublicKeys);
         }
-        if (includeHoldingInfo && shuffling.getHoldingType() != HoldingType.NXT) {
+        if (includeHoldingInfo && shuffling.getHoldingType() != HoldingType.SS) {
             JSONObject holdingJson = new JSONObject();
             if (shuffling.getHoldingType() == HoldingType.ASSET) {
                 putAssetInfo(holdingJson, shuffling.getHoldingId());

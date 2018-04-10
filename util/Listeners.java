@@ -47,11 +47,9 @@ public final class Listeners<T,E extends Enum<E>> {
 
     public void notify(T t, Enum<E> eventType) {
         List<Listener<T>> listeners = listenersMap.get(eventType);
-        if (listeners != null) {
-            for (Listener<T> listener : listeners) {
-                listener.notify(t);
-            }
-        }
+        if (listeners == null)  return;
+
+        for (Listener<T> listener : listeners)  listener.notify(t);
     }
 
 }

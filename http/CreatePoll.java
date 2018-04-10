@@ -50,7 +50,7 @@ public final class CreatePoll extends CreateTransaction {
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest req) throws ConchException {
 
         String nameValue = Convert.emptyToNull(req.getParameter("name"));
         String descriptionValue = req.getParameter("description");

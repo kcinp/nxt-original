@@ -46,7 +46,7 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
     int getInitialScanHeight();
 
-    void processPeerBlock(JSONObject request) throws NxtException;
+    void processPeerBlock(JSONObject request) throws ConchException;
 
     void fullReset();
 
@@ -66,7 +66,7 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
     Transaction restorePrunedTransaction(long transactionId);
 
-    class BlockNotAcceptedException extends NxtException {
+    class BlockNotAcceptedException extends ConchException {
 
         private final BlockImpl block;
 

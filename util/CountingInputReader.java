@@ -16,7 +16,7 @@
 
 package nxt.util;
 
-import nxt.NxtException.NxtIOException;
+import nxt.NxtException;
 
 import java.io.FilterReader;
 import java.io.IOException;
@@ -118,11 +118,11 @@ public class CountingInputReader extends FilterReader {
      * Increment the character count and check if the maximum count has been exceeded
      *
      * @param   c                   Number of characters read
-     * @throws  NxtIOException      Maximum count exceeded
+     * @throws ConchException.NxtIOException      Maximum count exceeded
      */
-    private void incCount(long c) throws NxtIOException {
+    private void incCount(long c) throws ConchException.NxtIOException {
         count += c;
         if (count > limit)
-            throw new NxtIOException("Maximum size exceeded: " + count);
+            throw new ConchException.NxtIOException("Maximum size exceeded: " + count);
     }
 }
