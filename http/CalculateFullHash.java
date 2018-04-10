@@ -53,7 +53,7 @@ public final class CalculateFullHash extends APIServlet.APIRequestHandler {
             digest.update(transaction.getUnsignedBytes());
             byte[] fullHash = digest.digest(Convert.parseHexString(signatureHashString));
             response.put("fullHash", Convert.toHexString(fullHash));
-        } catch (NxtException.NotValidException e) {
+        } catch (ConchException.NotValidException e) {
             JSONData.putException(response, e, "Incorrect unsigned transaction json or bytes");
         }
         return response;

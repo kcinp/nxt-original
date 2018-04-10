@@ -32,23 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static nxt.http.JSONResponses.ERROR_DISABLED;
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
-import static nxt.http.JSONResponses.LIGHT_CLIENT_DISABLED_API;
-import static nxt.http.JSONResponses.POST_REQUIRED;
-import static nxt.http.JSONResponses.REQUIRED_BLOCK_NOT_FOUND;
-import static nxt.http.JSONResponses.REQUIRED_LAST_BLOCK_NOT_FOUND;
+import static nxt.http.JSONResponses.*;
 
 public final class APIServlet extends HttpServlet {
 
@@ -89,9 +75,9 @@ public final class APIServlet extends HttpServlet {
             return fileParameter;
         }
 
-        protected abstract JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
+        protected abstract JSONStreamAware processRequest(HttpServletRequest request) throws ConchException;
 
-        protected JSONStreamAware processRequest(HttpServletRequest request, HttpServletResponse response) throws NxtException {
+        protected JSONStreamAware processRequest(HttpServletRequest request, HttpServletResponse response) throws ConchException {
             return processRequest(request);
         }
 
@@ -121,7 +107,7 @@ public final class APIServlet extends HttpServlet {
 
     }
 
-    private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.apiServerEnforcePOST");
+    private static final boolean enforcePost = Nxt.getBooleanProperty("sharder.apiServerEnforcePOST");
     static final Map<String,APIRequestHandler> apiRequestHandlers;
     static final Map<String,APIRequestHandler> disabledRequestHandlers;
 
@@ -141,7 +127,7 @@ public final class APIServlet extends HttpServlet {
         API.disabledAPIs.forEach(api -> {
             APIRequestHandler handler = map.remove(api);
             if (handler == null) {
-                throw new RuntimeException("Invalid API in nxt.disabledAPIs: " + api);
+                throw new RuntimeException("Invalid API in sharder.disabledAPIs: " + api);
             }
             disabledMap.put(api, handler);
         });
@@ -264,7 +250,7 @@ public final class APIServlet extends HttpServlet {
             }
         } catch (ParameterException e) {
             response = e.getErrorResponse();
-        } catch (NxtException | RuntimeException e) {
+        } catch (ConchException | RuntimeException e) {
             Logger.logDebugMessage("Error processing API request", e);
             JSONObject json = new JSONObject();
             JSONData.putException(json, e);

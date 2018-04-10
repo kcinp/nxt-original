@@ -1,8 +1,5 @@
 /*
-    Reed Solomon Encoding and Decoding for Nxt
-
-    Version: 1.0, license: Public Domain, coder: NxtChg (admin@nxtchg.com)
-    Java Version: ChuckOne (ChuckOne@mail.de).
+    Reed Solomon Encoding and Decoding for Conch
 */
 package nxt.crypto;
 

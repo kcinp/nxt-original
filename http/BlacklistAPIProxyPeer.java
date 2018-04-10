@@ -37,7 +37,7 @@ public class BlacklistAPIProxyPeer extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest request) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest request) throws ConchException {
         String peerAddress = Convert.emptyToNull(request.getParameter("peer"));
         if (peerAddress == null) {
             return MISSING_PEER;

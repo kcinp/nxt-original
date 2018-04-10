@@ -16,7 +16,6 @@
 
 package nxt;
 
-import nxt.AccountLedger.LedgerEvent;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import nxt.util.Logger;
@@ -82,6 +81,15 @@ final class BlockImpl implements Block {
             this.blockTransactions = Collections.unmodifiableList(transactions);
         }
     }
+
+    //just for genesis block
+    BlockImpl(long blockId,int version, int timestamp, long previousBlockId, long totalAmountNQT, long totalFeeNQT, int payloadLength, byte[] payloadHash,
+              byte[] generatorPublicKey, byte[] generationSignature, byte[] blockSignature, byte[] previousBlockHash, List<TransactionImpl> transactions){
+        this(version,  timestamp,  previousBlockId,  totalAmountNQT,  totalFeeNQT,  payloadLength, payloadHash,
+       generatorPublicKey, generationSignature, blockSignature, previousBlockHash, transactions);
+        this.id= blockId;
+    }
+
 
     BlockImpl(int version, int timestamp, long previousBlockId, long totalAmountNQT, long totalFeeNQT, int payloadLength,
               byte[] payloadHash, long generatorId, byte[] generationSignature, byte[] blockSignature,
@@ -260,7 +268,7 @@ final class BlockImpl implements Block {
         return json;
     }
 
-    static BlockImpl parseBlock(JSONObject blockData) throws NxtException.NotValidException {
+    static BlockImpl parseBlock(JSONObject blockData) throws ConchException.NotValidException {
         try {
             int version = ((Long) blockData.get("version")).intValue();
             int timestamp = ((Long) blockData.get("timestamp")).intValue();
@@ -280,10 +288,10 @@ final class BlockImpl implements Block {
             BlockImpl block = new BlockImpl(version, timestamp, previousBlock, totalAmountNQT, totalFeeNQT, payloadLength, payloadHash, generatorPublicKey,
                     generationSignature, blockSignature, previousBlockHash, blockTransactions);
             if (!block.checkSignature()) {
-                throw new NxtException.NotValidException("Invalid block signature");
+                throw new ConchException.NotValidException("Invalid block signature");
             }
             return block;
-        } catch (NxtException.NotValidException|RuntimeException e) {
+        } catch (ConchException.NotValidException|RuntimeException e) {
             Logger.logDebugMessage("Failed to parse block: " + blockData.toJSONString());
             throw e;
         }
@@ -303,8 +311,8 @@ final class BlockImpl implements Block {
             buffer.putLong(previousBlockId);
             buffer.putInt(getTransactions().size());
             if (version < 3) {
-                buffer.putInt((int) (totalAmountNQT / Constants.ONE_NXT));
-                buffer.putInt((int) (totalFeeNQT / Constants.ONE_NXT));
+                buffer.putInt((int) (totalAmountNQT / Constants.ONE_SS));
+                buffer.putInt((int) (totalFeeNQT / Constants.ONE_SS));
             } else {
                 buffer.putLong(totalAmountNQT);
                 buffer.putLong(totalFeeNQT);
@@ -352,7 +360,7 @@ final class BlockImpl implements Block {
             }
 
             Account account = Account.getAccount(getGeneratorId());
-            long effectiveBalance = account == null ? 0 : account.getEffectiveBalanceNXT();
+            long effectiveBalance = account == null ? 0 : account.getEffectiveBalanceSS();
             if (effectiveBalance <= 0) {
                 return false;
             }
@@ -408,15 +416,15 @@ final class BlockImpl implements Block {
                 }
                 totalBackFees += backFees[i];
                 Account previousGeneratorAccount = Account.getAccount(BlockDb.findBlockAtHeight(this.height - i - 1).getGeneratorId());
-                Logger.logDebugMessage("Back fees %f NXT to forger at height %d", ((double)backFees[i])/Constants.ONE_NXT, this.height - i - 1);
-                previousGeneratorAccount.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.BLOCK_GENERATED, getId(), backFees[i]);
-                previousGeneratorAccount.addToForgedBalanceNQT(backFees[i]);
-            }
-        }
+                Logger.logDebugMessage("Back fees %f SS to forger at height %d", ((double)backFees[i])/Constants.ONE_SS, this.height - i - 1);
+        previousGeneratorAccount.addToBalanceAndUnconfirmedBalanceNQT(AccountLedger.LedgerEvent.BLOCK_GENERATED, getId(), backFees[i]);
+        previousGeneratorAccount.addToForgedBalanceNQT(backFees[i]);
+    }
+}
         if (totalBackFees != 0) {
-            Logger.logDebugMessage("Fee reduced by %f NXT at height %d", ((double)totalBackFees)/Constants.ONE_NXT, this.height);
+            Logger.logDebugMessage("Fee reduced by %f SS at height %d", ((double)totalBackFees)/Constants.ONE_SS, this.height);
         }
-        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(LedgerEvent.BLOCK_GENERATED, getId(), totalFeeNQT - totalBackFees);
+        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(AccountLedger.LedgerEvent.BLOCK_GENERATED, getId(), totalFeeNQT - totalBackFees);
         generatorAccount.addToForgedBalanceNQT(totalFeeNQT - totalBackFees);
     }
 
@@ -447,7 +455,7 @@ final class BlockImpl implements Block {
 
     private void calculateBaseTarget(BlockImpl previousBlock) {
         long prevBaseTarget = previousBlock.baseTarget;
-        if (previousBlock.getHeight() < Constants.SHUFFLING_BLOCK) {
+        if (previousBlock.getHeight() <= Constants.SHUFFLING_BLOCK) {
             baseTarget = BigInteger.valueOf(prevBaseTarget)
                     .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
                     .divide(BigInteger.valueOf(60)).longValue();

@@ -102,9 +102,9 @@ public final class BaseTargetTest {
 
             int count = 0;
 
-            String dbLocation = Constants.isTestnet ? "nxt_test_db" : "nxt_db";
+            String dbLocation = Constants.isTestnet ? "sharder_test_db" : "sharder_db";
 
-            try (Connection con = DriverManager.getConnection("jdbc:h2:./" + dbLocation + "/nxt;DB_CLOSE_ON_EXIT=FALSE;MVCC=TRUE", "sa", "sa");
+            try (Connection con = DriverManager.getConnection("jdbc:h2:./" + dbLocation + "/sharder;DB_CLOSE_ON_EXIT=FALSE;MVCC=TRUE", "sa", "sa");
                  PreparedStatement selectBlocks = con.prepareStatement("SELECT * FROM block WHERE height > " + height + " ORDER BY db_id ASC");
                  ResultSet rs = selectBlocks.executeQuery()) {
 

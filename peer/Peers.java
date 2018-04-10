@@ -129,7 +129,7 @@ public final class Peers {
     static final int MAX_APPLICATION_LENGTH = 20;
     static final int MAX_PLATFORM_LENGTH = 30;
     static final int MAX_ANNOUNCED_ADDRESS_LENGTH = 100;
-    static final boolean hideErrorDetails = Nxt.getBooleanProperty("nxt.hideErrorDetails");
+    static final boolean hideErrorDetails = Nxt.getBooleanProperty("sharder.hideErrorDetails");
 
     private static final JSONObject myPeerInfo;
     private static final List<Peer.Service> myServices;
@@ -149,12 +149,12 @@ public final class Peers {
 
     static {
 
-        String platform = Nxt.getStringProperty("nxt.myPlatform", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
+        String platform = Nxt.getStringProperty("sharder.myPlatform", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
         if (platform.length() > MAX_PLATFORM_LENGTH) {
             platform = platform.substring(0, MAX_PLATFORM_LENGTH);
         }
         myPlatform = platform;
-        myAddress = Convert.emptyToNull(Nxt.getStringProperty("nxt.myAddress", "").trim());
+        myAddress = Convert.emptyToNull(Nxt.getStringProperty("sharder.myAddress", "").trim());
         if (myAddress != null && myAddress.endsWith(":" + TESTNET_PEER_PORT) && !Constants.isTestnet) {
             throw new RuntimeException("Port " + TESTNET_PEER_PORT + " should only be used for testnet!!!");
         }
@@ -201,13 +201,13 @@ public final class Peers {
                 Logger.logWarningMessage("Your announced address is not valid: " + e.toString());
             }
         }
-        myPeerServerPort = Nxt.getIntProperty("nxt.peerServerPort");
+        myPeerServerPort = Nxt.getIntProperty("sharder.peerServerPort");
         if (myPeerServerPort == TESTNET_PEER_PORT && !Constants.isTestnet) {
             throw new RuntimeException("Port " + TESTNET_PEER_PORT + " should only be used for testnet!!!");
         }
-        shareMyAddress = Nxt.getBooleanProperty("nxt.shareMyAddress") && ! Constants.isOffline;
-        enablePeerUPnP = Nxt.getBooleanProperty("nxt.enablePeerUPnP");
-        myHallmark = Convert.emptyToNull(Nxt.getStringProperty("nxt.myHallmark", "").trim());
+        shareMyAddress = Nxt.getBooleanProperty("sharder.shareMyAddress") && ! Constants.isOffline;
+        enablePeerUPnP = Nxt.getBooleanProperty("sharder.enablePeerUPnP");
+        myHallmark = Convert.emptyToNull(Nxt.getStringProperty("sharder.myHallmark", "").trim());
         if (Peers.myHallmark != null && Peers.myHallmark.length() > 0) {
             try {
                 Hallmark hallmark = Hallmark.parseHallmark(Peers.myHallmark);
@@ -223,7 +223,7 @@ public final class Peers {
                     }
                 }
             } catch (RuntimeException e) {
-                Logger.logErrorMessage("Your hallmark is invalid: " + Peers.myHallmark + " for your address: " + myAddress);
+                Logger.logErrorMessage("Your hallmark is invalid: " + Peers.myHallmark + " for your address: " + myAddress + "[" + e.getMessage() + "]");
                 throw new RuntimeException(e.toString(), e);
             }
         }
@@ -306,40 +306,40 @@ public final class Peers {
         Logger.logDebugMessage("My peer info:\n" + json.toJSONString());
         myPeerInfo = json;
 
-        final List<String> defaultPeers = Constants.isTestnet ? Nxt.getStringListProperty("nxt.defaultTestnetPeers")
-                : Nxt.getStringListProperty("nxt.defaultPeers");
-        wellKnownPeers = Collections.unmodifiableList(Constants.isTestnet ? Nxt.getStringListProperty("nxt.testnetPeers")
-                : Nxt.getStringListProperty("nxt.wellKnownPeers"));
+        final List<String> defaultPeers = Constants.isTestnet ? Nxt.getStringListProperty("sharder.defaultTestnetPeers")
+                : Nxt.getStringListProperty("sharder.defaultPeers");
+        wellKnownPeers = Collections.unmodifiableList(Constants.isTestnet ? Nxt.getStringListProperty("sharder.testnetPeers")
+                : Nxt.getStringListProperty("sharder.wellKnownPeers"));
 
-        List<String> knownBlacklistedPeersList = Nxt.getStringListProperty("nxt.knownBlacklistedPeers");
+        List<String> knownBlacklistedPeersList = Nxt.getStringListProperty("sharder.knownBlacklistedPeers");
         if (knownBlacklistedPeersList.isEmpty()) {
             knownBlacklistedPeers = Collections.emptySet();
         } else {
             knownBlacklistedPeers = Collections.unmodifiableSet(new HashSet<>(knownBlacklistedPeersList));
         }
 
-        maxNumberOfInboundConnections = Nxt.getIntProperty("nxt.maxNumberOfInboundConnections");
-        maxNumberOfOutboundConnections = Nxt.getIntProperty("nxt.maxNumberOfOutboundConnections");
-        maxNumberOfConnectedPublicPeers = Math.min(Nxt.getIntProperty("nxt.maxNumberOfConnectedPublicPeers"),
+        maxNumberOfInboundConnections = Nxt.getIntProperty("sharder.maxNumberOfInboundConnections");
+        maxNumberOfOutboundConnections = Nxt.getIntProperty("sharder.maxNumberOfOutboundConnections");
+        maxNumberOfConnectedPublicPeers = Math.min(Nxt.getIntProperty("sharder.maxNumberOfConnectedPublicPeers"),
                 maxNumberOfOutboundConnections);
-        maxNumberOfKnownPeers = Nxt.getIntProperty("nxt.maxNumberOfKnownPeers");
-        minNumberOfKnownPeers = Nxt.getIntProperty("nxt.minNumberOfKnownPeers");
-        connectTimeout = Nxt.getIntProperty("nxt.connectTimeout");
-        readTimeout = Nxt.getIntProperty("nxt.readTimeout");
-        enableHallmarkProtection = Nxt.getBooleanProperty("nxt.enableHallmarkProtection") && !Constants.isLightClient;
-        pushThreshold = Nxt.getIntProperty("nxt.pushThreshold");
-        pullThreshold = Nxt.getIntProperty("nxt.pullThreshold");
-        useWebSockets = Nxt.getBooleanProperty("nxt.useWebSockets");
-        webSocketIdleTimeout = Nxt.getIntProperty("nxt.webSocketIdleTimeout");
-        isGzipEnabled = Nxt.getBooleanProperty("nxt.enablePeerServerGZIPFilter");
-        blacklistingPeriod = Nxt.getIntProperty("nxt.blacklistingPeriod") / 1000;
-        communicationLoggingMask = Nxt.getIntProperty("nxt.communicationLoggingMask");
-        sendToPeersLimit = Nxt.getIntProperty("nxt.sendToPeersLimit");
-        usePeersDb = Nxt.getBooleanProperty("nxt.usePeersDb") && ! Constants.isOffline;
-        savePeers = usePeersDb && Nxt.getBooleanProperty("nxt.savePeers");
-        getMorePeers = Nxt.getBooleanProperty("nxt.getMorePeers");
-        cjdnsOnly = Nxt.getBooleanProperty("nxt.cjdnsOnly");
-        ignorePeerAnnouncedAddress = Nxt.getBooleanProperty("nxt.ignorePeerAnnouncedAddress");
+        maxNumberOfKnownPeers = Nxt.getIntProperty("sharder.maxNumberOfKnownPeers");
+        minNumberOfKnownPeers = Nxt.getIntProperty("sharder.minNumberOfKnownPeers");
+        connectTimeout = Nxt.getIntProperty("sharder.connectTimeout");
+        readTimeout = Nxt.getIntProperty("sharder.readTimeout");
+        enableHallmarkProtection = Nxt.getBooleanProperty("sharder.enableHallmarkProtection") && !Constants.isLightClient;
+        pushThreshold = Nxt.getIntProperty("sharder.pushThreshold");
+        pullThreshold = Nxt.getIntProperty("sharder.pullThreshold");
+        useWebSockets = Nxt.getBooleanProperty("sharder.useWebSockets");
+        webSocketIdleTimeout = Nxt.getIntProperty("sharder.webSocketIdleTimeout");
+        isGzipEnabled = Nxt.getBooleanProperty("sharder.enablePeerServerGZIPFilter");
+        blacklistingPeriod = Nxt.getIntProperty("sharder.blacklistingPeriod") / 1000;
+        communicationLoggingMask = Nxt.getIntProperty("sharder.communicationLoggingMask");
+        sendToPeersLimit = Nxt.getIntProperty("sharder.sendToPeersLimit");
+        usePeersDb = Nxt.getBooleanProperty("sharder.usePeersDb") && ! Constants.isOffline;
+        savePeers = usePeersDb && Nxt.getBooleanProperty("sharder.savePeers");
+        getMorePeers = Nxt.getBooleanProperty("sharder.getMorePeers");
+        cjdnsOnly = Nxt.getBooleanProperty("sharder.cjdnsOnly");
+        ignorePeerAnnouncedAddress = Nxt.getBooleanProperty("sharder.ignorePeerAnnouncedAddress");
         if (useWebSockets && useProxy) {
             Logger.logMessage("Using a proxy, will not create outbound websockets.");
         }
@@ -362,7 +362,7 @@ public final class Peers {
                             List<PeerDb.Entry> dbPeers = PeerDb.loadPeers();
                             dbPeers.forEach(entry -> {
                                 if (!entries.add(entry)) {
-                                    // Database entries override entries from nxt.properties
+                                    // Database entries override entries from sharder.properties
                                     entries.remove(entry);
                                     entries.add(entry);
                                 }
@@ -415,9 +415,9 @@ public final class Peers {
                 ServerConnector connector = new ServerConnector(peerServer);
                 final int port = Constants.isTestnet ? TESTNET_PEER_PORT : Peers.myPeerServerPort;
                 connector.setPort(port);
-                final String host = Nxt.getStringProperty("nxt.peerServerHost");
+                final String host = Nxt.getStringProperty("sharder.peerServerHost");
                 connector.setHost(host);
-                connector.setIdleTimeout(Nxt.getIntProperty("nxt.peerServerIdleTimeout"));
+                connector.setIdleTimeout(Nxt.getIntProperty("sharder.peerServerIdleTimeout"));
                 connector.setReuseAddress(true);
                 peerServer.addConnector(connector);
 
@@ -427,12 +427,12 @@ public final class Peers {
                 ServletHolder peerServletHolder = new ServletHolder(new PeerServlet());
                 ctxHandler.addServlet(peerServletHolder, "/*");
 
-                if (Nxt.getBooleanProperty("nxt.enablePeerServerDoSFilter")) {
+                if (Nxt.getBooleanProperty("sharder.enablePeerServerDoSFilter")) {
                     FilterHolder dosFilterHolder = ctxHandler.addFilter(DoSFilter.class, "/*",
                             EnumSet.of(DispatcherType.REQUEST));
-                    dosFilterHolder.setInitParameter("maxRequestsPerSec", Nxt.getStringProperty("nxt.peerServerDoSFilter.maxRequestsPerSec"));
-                    dosFilterHolder.setInitParameter("delayMs", Nxt.getStringProperty("nxt.peerServerDoSFilter.delayMs"));
-                    dosFilterHolder.setInitParameter("maxRequestMs", Nxt.getStringProperty("nxt.peerServerDoSFilter.maxRequestMs"));
+                    dosFilterHolder.setInitParameter("maxRequestsPerSec", Nxt.getStringProperty("sharder.peerServerDoSFilter.maxRequestsPerSec"));
+                    dosFilterHolder.setInitParameter("delayMs", Nxt.getStringProperty("sharder.peerServerDoSFilter.delayMs"));
+                    dosFilterHolder.setInitParameter("maxRequestMs", Nxt.getStringProperty("sharder.peerServerDoSFilter.maxRequestMs"));
                     dosFilterHolder.setInitParameter("trackSessions", "false");
                     dosFilterHolder.setAsyncSupported(true);
                 }
@@ -1221,7 +1221,7 @@ public final class Peers {
     /**
      * Return local peer services
      *
-     * @return                      List of local peer services
+     * @return List of local peer services
      */
     public static List<Peer.Service> getServices() {
         return myServices;
@@ -1229,7 +1229,9 @@ public final class Peers {
 
     private static void checkBlockchainState() {
         Peer.BlockchainState state = Constants.isLightClient ? Peer.BlockchainState.LIGHT_CLIENT :
+                //区块链处于下载中 or 区块链中最后一个块的创建时间小于创世块(2013-10-24 12:00:00)的时间 -> 下载中
                 (Nxt.getBlockchainProcessor().isDownloading() || Nxt.getBlockchain().getLastBlockTimestamp() < Nxt.getEpochTime() - 600) ? Peer.BlockchainState.DOWNLOADING :
+                        //区块链中最后一个块的基础难度除以基础难度大于10并且不是测试网络 -> 分叉 : 最新的
                         (Nxt.getBlockchain().getLastBlock().getBaseTarget() / Constants.INITIAL_BASE_TARGET > 10 && !Constants.isTestnet) ? Peer.BlockchainState.FORK :
                         Peer.BlockchainState.UP_TO_DATE;
         if (state != currentBlockchainState) {

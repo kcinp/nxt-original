@@ -31,7 +31,7 @@ public final class AddOns {
     private static final List<AddOn> addOns;
     static {
         List<AddOn> addOnsList = new ArrayList<>();
-        Nxt.getStringListProperty("nxt.addOns").forEach(addOn -> {
+        Nxt.getStringListProperty("sharder.addOns").forEach(addOn -> {
             try {
                 addOnsList.add((AddOn)Class.forName(addOn).newInstance());
             } catch (ReflectiveOperationException e) {
@@ -39,8 +39,8 @@ public final class AddOns {
             }
         });
         addOns = Collections.unmodifiableList(addOnsList);
-        if (!addOns.isEmpty() && !Nxt.getBooleanProperty("nxt.disableSecurityPolicy")) {
-            System.setProperty("java.security.policy", Nxt.isDesktopApplicationEnabled() ? "nxtdesktop.policy" : "nxt.policy");
+        if (!addOns.isEmpty() && !Nxt.getBooleanProperty("sharder.disableSecurityPolicy")) {
+            System.setProperty("java.security.policy", Nxt.isDesktopApplicationEnabled() ? "desktop.policy" : "sharder.policy");
             Logger.logMessage("Setting security manager with policy " + System.getProperty("java.security.policy"));
             System.setSecurityManager(new SecurityManager() {
                 @Override

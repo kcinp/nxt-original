@@ -20,6 +20,7 @@ import nxt.Nxt;
 import nxt.NxtException;
 import nxt.Transaction;
 import nxt.util.Convert;
+import nxt.Appendix;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -27,14 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * The purpose of broadcast transaction is to support client side signing of transactions.
- * Clients first submit their transaction using {@link nxt.http.CreateTransaction} without providing the secret phrase.<br>
+ * Clients first submit their transaction using {@link CreateTransaction} without providing the secret phrase.<br>
  * In response the client receives the unsigned transaction JSON and transaction bytes.
  * <p>
- * The client then signs and submits the signed transaction using {@link nxt.http.BroadcastTransaction}
+ * The client then signs and submits the signed transaction using {@link BroadcastTransaction}
  * <p>
  * The default wallet implements this procedure in nrs.server.js which you can use as reference.
  * <p>
- * {@link nxt.http.BroadcastTransaction} accepts the following parameters:<br>
+ * {@link BroadcastTransaction} accepts the following parameters:<br>
  * transactionJSON - JSON representation of the signed transaction<br>
  * transactionBytes - row bytes composing the signed transaction bytes excluding the prunable appendages<br>
  * prunableAttachmentJSON - JSON representation of the prunable appendages<br>
@@ -43,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
  * In case the client submits transactionBytes for a transaction containing prunable appendages, the client also needs
  * to submit the prunableAttachmentJSON parameter which includes the attachment JSON for the prunable appendages.<br>
  * <p>
- * Prunable appendages are classes implementing the {@link nxt.Appendix.Prunable} interface.
+ * Prunable appendages are classes implementing the {@link Appendix.Prunable} interface.
  */
 public final class BroadcastTransaction extends APIServlet.APIRequestHandler {
 
@@ -67,7 +68,7 @@ public final class BroadcastTransaction extends APIServlet.APIRequestHandler {
             Nxt.getTransactionProcessor().broadcast(transaction);
             response.put("transaction", transaction.getStringId());
             response.put("fullHash", transaction.getFullHash());
-        } catch (NxtException.ValidationException|RuntimeException e) {
+        } catch (ConchException.ValidationException |RuntimeException e) {
             JSONData.putException(response, e, "Failed to broadcast transaction");
         }
         return response;

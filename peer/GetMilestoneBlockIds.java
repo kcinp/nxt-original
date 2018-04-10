@@ -17,6 +17,7 @@
 package nxt.peer;
 
 import nxt.Block;
+import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Convert;
 import nxt.util.Logger;
@@ -65,7 +66,7 @@ final class GetMilestoneBlockIds extends PeerServlet.PeerRequestHandler {
                     throw new IllegalStateException("Don't have block " + lastMilestoneBlockIdString);
                 }
                 height = lastMilestoneBlock.getHeight();
-                jump = Math.min(1440, Math.max(blockchainHeight - height, 1));
+                jump = Math.min(Constants.GUARANTEED_BALANCE_CONFIRMATIONS, Math.max(blockchainHeight - height, 1));
                 height = Math.max(height - jump, 0);
             } else if (lastBlockIdString != null) {
                 height = blockchainHeight;

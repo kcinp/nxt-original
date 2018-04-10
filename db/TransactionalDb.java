@@ -19,11 +19,7 @@ package nxt.db;
 import nxt.Nxt;
 import nxt.util.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,9 +33,9 @@ public class TransactionalDb extends BasicDb {
     private static final long txInterval;
     static {
         long temp;
-        stmtThreshold = (temp=Nxt.getIntProperty("nxt.statementLogThreshold")) != 0 ? temp : 1000;
-        txThreshold = (temp=Nxt.getIntProperty("nxt.transactionLogThreshold")) != 0 ? temp : 5000;
-        txInterval = (temp=Nxt.getIntProperty("nxt.transactionLogInterval")) != 0 ? temp*60*1000 : 15*60*1000;
+        stmtThreshold = (temp= Nxt.getIntProperty("sharder.statementLogThreshold")) != 0 ? temp : 1000;
+        txThreshold = (temp= Nxt.getIntProperty("sharder.transactionLogThreshold")) != 0 ? temp : 5000;
+        txInterval = (temp= Nxt.getIntProperty("sharder.transactionLogInterval")) != 0 ? temp*60*1000 : 15*60*1000;
     }
 
     private final ThreadLocal<DbConnection> localConnection = new ThreadLocal<>();
@@ -190,7 +186,7 @@ public class TransactionalDb extends BasicDb {
         boolean firstLine = true;
         for (int i=3; i<stackTrace.length; i++) {
             String line = stackTrace[i].toString();
-            if (!line.startsWith("nxt."))
+            if (!line.startsWith("sharder."))
                 break;
             if (firstLine)
                 firstLine = false;

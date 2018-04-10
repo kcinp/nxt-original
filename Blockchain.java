@@ -18,6 +18,7 @@ package nxt;
 
 import nxt.db.DbIterator;
 import nxt.util.Filter;
+import nxt.db.DbIterator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

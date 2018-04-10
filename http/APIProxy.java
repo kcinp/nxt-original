@@ -23,12 +23,7 @@ import nxt.peer.Peers;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -38,9 +33,9 @@ public class APIProxy {
     private static final APIProxy instance = new APIProxy();
 
     static final boolean enableAPIProxy = Constants.isLightClient ||
-            (Nxt.getBooleanProperty("nxt.enableAPIProxy") && API.openAPIPort == 0 && API.openAPISSLPort == 0);
-    private static final int blacklistingPeriod = Nxt.getIntProperty("nxt.apiProxyBlacklistingPeriod") / 1000;
-    static final String forcedServerURL = Nxt.getStringProperty("nxt.forceAPIProxyServerURL", "");
+            (Nxt.getBooleanProperty("sharder.enableAPIProxy") && API.openAPIPort == 0 && API.openAPISSLPort == 0);
+    private static final int blacklistingPeriod = Nxt.getIntProperty("sharder.apiProxyBlacklistingPeriod") / 1000;
+    static final String forcedServerURL = Nxt.getStringProperty("sharder.forceAPIProxyServerURL", "");
 
     private volatile String forcedPeerHost;
     private volatile List<String> peersHosts = Collections.emptyList();

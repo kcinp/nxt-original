@@ -16,9 +16,9 @@
 
 package nxt.util;
 
-import nxt.Nxt;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
+import nxt.Nxt;
 
 import java.net.InetAddress;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class UPnP {
         }
     }
 
-    /**
+    /**Con
      * Delete a port from the UPnP mapping
      *
      * @param   port                Port to delete
@@ -122,9 +122,9 @@ public class UPnP {
         //
         try {
             Logger.logInfoMessage("Looking for UPnP gateway device...");
-            GatewayDevice.setHttpReadTimeout(Nxt.getIntProperty("nxt.upnpGatewayTimeout", GatewayDevice.getHttpReadTimeout()));
+            GatewayDevice.setHttpReadTimeout(Nxt.getIntProperty("sharder.upnpGatewayTimeout", GatewayDevice.getHttpReadTimeout()));
             GatewayDiscover discover = new GatewayDiscover();
-            discover.setTimeout(Nxt.getIntProperty("nxt.upnpDiscoverTimeout", discover.getTimeout()));
+            discover.setTimeout(Nxt.getIntProperty("sharder.upnpDiscoverTimeout", discover.getTimeout()));
             Map<InetAddress, GatewayDevice> gatewayMap = discover.discover();
             if (gatewayMap == null || gatewayMap.isEmpty()) {
                 Logger.logDebugMessage("There are no UPnP gateway devices");

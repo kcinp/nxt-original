@@ -16,19 +16,14 @@
 
 package nxt.tools;
 
+import nxt.cpos.core.NxtGenesis;
 import nxt.Constants;
-import nxt.Genesis;
 import nxt.util.Convert;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class VerifyTraceFile {
 
@@ -64,7 +59,7 @@ public final class VerifyTraceFile {
     }
 
     public static void main(String[] args) {
-        String fileName = args.length == 1 ? args[0] : "nxt-trace.csv";
+        String fileName = args.length == 1 ? args[0] : "sharder-trace.csv";
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line = reader.readLine();
             String[] headers = unquote(line.split("\t"));
@@ -99,7 +94,7 @@ public final class VerifyTraceFile {
                     String assetId = valueMap.get("asset");
                     issuedAssetQuantities.put(assetId, Long.parseLong(valueMap.get("asset quantity")));
                 }
-                if ("asset transfer".equals(event) && Genesis.CREATOR_ID == Convert.parseUnsignedLong(accountId)) {
+                if ("asset transfer".equals(event) && ConchGenesis.CREATOR_ID == Convert.parseUnsignedLong(accountId)) {
                     String assetId = valueMap.get("asset");
                     long deletedQuantity = Long.parseLong(valueMap.get("asset quantity"));
                     long currentQuantity = issuedAssetQuantities.get(assetId);
@@ -225,7 +220,7 @@ public final class VerifyTraceFile {
                     }
                     System.out.println("total confirmed asset quantity change: " + totalAssetDelta);
                     long assetBalance = nullToZero(assetValues.get("asset balance"));
-                    if (assetBalance != totalAssetDelta && (Genesis.CREATOR_ID != Convert.parseUnsignedLong(accountId) || assetBalance != 0)) {
+                    if (assetBalance != totalAssetDelta && (ConchGenesis.CREATOR_ID != Convert.parseUnsignedLong(accountId) || assetBalance != 0)) {
                         System.out.println("ERROR: asset balance doesn't match total asset quantity change!!!");
                         failed.add(accountId);
                     }

@@ -34,7 +34,7 @@ public final class GetAliases extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    protected JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    protected JSONStreamAware processRequest(HttpServletRequest req) throws ConchException {
         final int timestamp = ParameterParser.getTimestamp(req);
         final long accountId = ParameterParser.getAccountId(req, true);
         int firstIndex = ParameterParser.getFirstIndex(req);

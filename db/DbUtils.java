@@ -17,6 +17,7 @@
 package nxt.db;
 
 import nxt.util.Logger;
+import nxt.util.Logger;
 
 import java.sql.Array;
 import java.sql.Connection;

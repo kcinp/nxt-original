@@ -36,7 +36,7 @@ import java.sql.Statement;
  *
  * To run the database compact tool on Windows:
  *
- *   java -cp "classes;lib/*;conf" -Dnxt.runtime.mode=desktop nxt.tools.CompactDatabase
+ *   java -cp "classes;lib/*;conf" -Dsharder.runtime.mode=desktop nxt.tools.CompactDatabase
  */
 public class CompactDatabase {
 
@@ -69,7 +69,7 @@ public class CompactDatabase {
         //
         // Get the database URL
         //
-        String dbPrefix = Constants.isTestnet ? "nxt.testDb" : "nxt.db";
+        String dbPrefix = Constants.isTestnet ? "sharder.testDb" : "sharder.db";
         String dbType = Nxt.getStringProperty(dbPrefix + "Type");
         if (!"h2".equals(dbType)) {
             Logger.logErrorMessage("Database type must be 'h2'");
@@ -137,11 +137,11 @@ public class CompactDatabase {
         //
         int phase = 0;
         File sqlFile = new File(dbDir, "backup.sql.gz");
-        File dbFile = new File(dbDir, "nxt.h2.db");
+        File dbFile = new File(dbDir, "sharder.h2.db");
         if (!dbFile.exists()) {
-            dbFile = new File(dbDir, "nxt.mv.db");
+            dbFile = new File(dbDir, "sharder.mv.db");
             if (!dbFile.exists()) {
-                Logger.logErrorMessage("NRS database not found");
+                Logger.logErrorMessage("Sharder database not found");
                 return 1;
             }
         }
@@ -198,13 +198,13 @@ public class CompactDatabase {
                     //
                     // We failed while creating the new database
                     //
-                    File newFile = new File(dbDir, "nxt.h2.db");
+                    File newFile = new File(dbDir, "sharder.h2.db");
                     if (newFile.exists()) {
                         if (!newFile.delete()) {
                             Logger.logErrorMessage(String.format("Unable to delete '%s'", newFile.getPath()));
                         }
                     } else {
-                        newFile = new File(dbDir, "nxt.mv.db");
+                        newFile = new File(dbDir, "sharder.mv.db");
                         if (newFile.exists()) {
                             if (!newFile.delete()) {
                                 Logger.logErrorMessage(String.format("Unable to delete '%s'", newFile.getPath()));

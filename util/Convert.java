@@ -103,7 +103,7 @@ public final class Convert {
             return 0;
         }
         account = account.toUpperCase();
-        if (account.startsWith("NXT-")) {
+        if (account.startsWith(Constants.ACCOUNT_PREFIX)) {
             return Crypto.rsDecode(account.substring(4));
         } else {
             return Long.parseUnsignedLong(account);
@@ -111,7 +111,7 @@ public final class Convert {
     }
 
     public static String rsAccount(long accountId) {
-        return "NXT-" + Crypto.rsEncode(accountId);
+        return Constants.ACCOUNT_PREFIX + Crypto.rsEncode(accountId);
     }
 
     public static long fullHashToId(byte[] hash) {
@@ -237,9 +237,9 @@ public final class Convert {
         return bytes;
     }
 
-    public static String readString(ByteBuffer buffer, int numBytes, int maxLength) throws NxtException.NotValidException {
+    public static String readString(ByteBuffer buffer, int numBytes, int maxLength) throws ConchException.NotValidException {
         if (numBytes > 3 * maxLength) {
-            throw new NxtException.NotValidException("Max parameter length exceeded");
+            throw new ConchException.NotValidException("Max parameter length exceeded");
         }
         byte[] bytes = new byte[numBytes];
         buffer.get(bytes);
@@ -250,8 +250,8 @@ public final class Convert {
         return s == null ? replaceNull : s.length() > limit ? (s.substring(0, dots ? limit - 3 : limit) + (dots ? "..." : "")) : s;
     }
 
-    public static long parseNXT(String nxt) {
-        return parseStringFraction(nxt, 8, Constants.MAX_BALANCE_NXT);
+    public static long parseSS(String ss) {
+        return parseStringFraction(ss, 8, Constants.MAX_BALANCE_SS);
     }
 
     private static long parseStringFraction(String value, int decimals, long maxValue) {

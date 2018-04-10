@@ -35,11 +35,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 final class TransactionProcessorImpl implements TransactionProcessor {
 
-    private static final boolean enableTransactionRebroadcasting = Nxt.getBooleanProperty("nxt.enableTransactionRebroadcasting");
-    private static final boolean testUnconfirmedTransactions = Nxt.getBooleanProperty("nxt.testUnconfirmedTransactions");
+    private static final boolean enableTransactionRebroadcasting = Nxt.getBooleanProperty("sharder.enableTransactionRebroadcasting");
+    private static final boolean testUnconfirmedTransactions = Nxt.getBooleanProperty("sharder.testUnconfirmedTransactions");
     private static final int maxUnconfirmedTransactions;
     static {
-        int n = Nxt.getIntProperty("nxt.maxUnconfirmedTransactions");
+        int n = Nxt.getIntProperty("sharder.maxUnconfirmedTransactions");
         maxUnconfirmedTransactions = n <= 0 ? Integer.MAX_VALUE : n;
     }
 
@@ -252,7 +252,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
                 }
                 try {
                     processPeerTransactions(transactionsData);
-                } catch (NxtException.ValidationException|RuntimeException e) {
+                } catch (ConchException.ValidationException|RuntimeException e) {
                     peer.blacklist(e);
                 }
             } catch (Exception e) {
@@ -393,7 +393,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
     }
 
     @Override
-    public void broadcast(Transaction transaction) throws NxtException.ValidationException {
+    public void broadcast(Transaction transaction) throws ConchException.ValidationException {
         BlockchainImpl.getInstance().writeLock();
         try {
             if (TransactionDb.hasTransaction(transaction.getId())) {
@@ -432,7 +432,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
     }
 
     @Override
-    public void processPeerTransactions(JSONObject request) throws NxtException.ValidationException {
+    public void processPeerTransactions(JSONObject request) throws ConchException.ValidationException {
         JSONArray transactionsData = (JSONArray)request.get("transactions");
         processPeerTransactions(transactionsData);
     }
@@ -586,14 +586,14 @@ final class TransactionProcessorImpl implements TransactionProcessor {
                         processTransaction(unconfirmedTransaction);
                         iterator.remove();
                         addedUnconfirmedTransactions.add(unconfirmedTransaction.getTransaction());
-                    } catch (NxtException.ExistingTransactionException e) {
+                    } catch (ConchException.ExistingTransactionException e) {
                         iterator.remove();
-                    } catch (NxtException.NotCurrentlyValidException e) {
+                    } catch (ConchException.NotCurrentlyValidException e) {
                         if (unconfirmedTransaction.getExpiration() < currentTime
                                 || currentTime - Convert.toEpochTime(unconfirmedTransaction.getArrivalTimestamp()) > 3600) {
                             iterator.remove();
                         }
-                    } catch (NxtException.ValidationException|RuntimeException e) {
+                    } catch (ConchException.ValidationException|RuntimeException e) {
                         iterator.remove();
                     }
                 }
@@ -606,7 +606,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
         }
     }
 
-    private void processPeerTransactions(JSONArray transactionsData) throws NxtException.NotValidException {
+    private void processPeerTransactions(JSONArray transactionsData) throws ConchException.NotValidException {
         if (Nxt.getBlockchain().getHeight() <= Constants.LAST_KNOWN_BLOCK && !testUnconfirmedTransactions) {
             return;
         }
@@ -636,8 +636,8 @@ final class TransactionProcessorImpl implements TransactionProcessor {
                 }
                 addedUnconfirmedTransactions.add(transaction);
 
-            } catch (NxtException.NotCurrentlyValidException ignore) {
-            } catch (NxtException.ValidationException|RuntimeException e) {
+            } catch (ConchException.NotCurrentlyValidException ignore) {
+            } catch (ConchException.ValidationException|RuntimeException e) {
                 Logger.logDebugMessage(String.format("Invalid transaction from peer: %s", ((JSONObject) transactionData).toJSONString()), e);
                 exceptions.add(e);
             }
@@ -650,21 +650,21 @@ final class TransactionProcessorImpl implements TransactionProcessor {
         }
         broadcastedTransactions.removeAll(receivedTransactions);
         if (!exceptions.isEmpty()) {
-            throw new NxtException.NotValidException("Peer sends invalid transactions: " + exceptions.toString());
+            throw new ConchException.NotValidException("Peer sends invalid transactions: " + exceptions.toString());
         }
     }
 
-    private void processTransaction(UnconfirmedTransaction unconfirmedTransaction) throws NxtException.ValidationException {
+    private void processTransaction(UnconfirmedTransaction unconfirmedTransaction) throws ConchException.ValidationException {
         TransactionImpl transaction = unconfirmedTransaction.getTransaction();
         int curTime = Nxt.getEpochTime();
         if (transaction.getTimestamp() > curTime + Constants.MAX_TIMEDRIFT || transaction.getExpiration() < curTime) {
-            throw new NxtException.NotCurrentlyValidException("Invalid transaction timestamp");
+            throw new ConchException.NotCurrentlyValidException("Invalid transaction timestamp");
         }
         if (transaction.getVersion() < 1) {
-            throw new NxtException.NotValidException("Invalid transaction version");
+            throw new ConchException.NotValidException("Invalid transaction version");
         }
         if (transaction.getId() == 0L) {
-            throw new NxtException.NotValidException("Invalid transaction id 0");
+            throw new ConchException.NotValidException("Invalid transaction id 0");
         }
 
         BlockchainImpl.getInstance().writeLock();
@@ -672,27 +672,27 @@ final class TransactionProcessorImpl implements TransactionProcessor {
             try {
                 Db.db.beginTransaction();
                 if (Nxt.getBlockchain().getHeight() <= Constants.LAST_KNOWN_BLOCK && !testUnconfirmedTransactions) {
-                    throw new NxtException.NotCurrentlyValidException("Blockchain not ready to accept transactions");
+                    throw new ConchException.NotCurrentlyValidException("Blockchain not ready to accept transactions");
                 }
 
                 if (getUnconfirmedTransaction(transaction.getDbKey()) != null || TransactionDb.hasTransaction(transaction.getId())) {
-                    throw new NxtException.ExistingTransactionException("Transaction already processed");
+                    throw new ConchException.ExistingTransactionException("Transaction already processed");
                 }
 
                 if (! transaction.verifySignature()) {
                     if (Account.getAccount(transaction.getSenderId()) != null) {
-                        throw new NxtException.NotValidException("Transaction signature verification failed");
+                        throw new ConchException.NotValidException("Transaction signature verification failed");
                     } else {
-                        throw new NxtException.NotCurrentlyValidException("Unknown transaction sender");
+                        throw new ConchException.NotCurrentlyValidException("Unknown transaction sender");
                     }
                 }
 
                 if (! transaction.applyUnconfirmed()) {
-                    throw new NxtException.InsufficientBalanceException("Insufficient balance");
+                    throw new ConchException.InsufficientBalanceException("Insufficient balance");
                 }
 
                 if (transaction.isUnconfirmedDuplicate(unconfirmedDuplicates)) {
-                    throw new NxtException.NotCurrentlyValidException("Duplicate unconfirmed transaction");
+                    throw new ConchException.NotCurrentlyValidException("Duplicate unconfirmed transaction");
                 }
 
                 unconfirmedTransactionTable.insert(unconfirmedTransaction);
@@ -769,10 +769,10 @@ final class TransactionProcessorImpl implements TransactionProcessor {
      *
      * @param   transactions                        Transactions containing prunable data
      * @return                                      Processed transactions
-     * @throws  NxtException.NotValidException    Transaction is not valid
+     * @throws  ConchException.NotValidException    Transaction is not valid
      */
     @Override
-    public List<Transaction> restorePrunableData(JSONArray transactions) throws NxtException.NotValidException {
+    public List<Transaction> restorePrunableData(JSONArray transactions) throws ConchException.NotValidException {
         List<Transaction> processed = new ArrayList<>();
         Nxt.getBlockchain().readLock();
         try {

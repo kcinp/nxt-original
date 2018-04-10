@@ -327,7 +327,7 @@ final class PeerImpl implements Peer {
             hallmarkBalance = account == null ? 0 : account.getBalanceNQT();
             hallmarkBalanceHeight = Nxt.getBlockchain().getHeight();
         }
-        return (int)(adjustedWeight * (hallmarkBalance / Constants.ONE_NXT) / Constants.MAX_BALANCE_NXT);
+        return (int)(adjustedWeight * (hallmarkBalance / Constants.ONE_SS) / Constants.MAX_BALANCE_SS);
     }
 
     @Override
@@ -338,7 +338,7 @@ final class PeerImpl implements Peer {
 
     @Override
     public void blacklist(Exception cause) {
-        if (cause instanceof NxtException.NotCurrentlyValidException || cause instanceof BlockchainProcessor.BlockOutOfOrderException
+        if (cause instanceof ConchException.NotCurrentlyValidException || cause instanceof BlockchainProcessor.BlockOutOfOrderException
                 || cause instanceof SQLException || cause.getCause() instanceof SQLException) {
             // don't blacklist peers just because a feature is not yet enabled, or because of database timeouts
             // prevents erroneous blacklisting during loading of blockchain from scratch
@@ -469,7 +469,7 @@ final class PeerImpl implements Peer {
             // Create a new WebSocket session if we don't have one
             //
             if (useWebSocket && !webSocket.isOpen())
-                useWebSocket = webSocket.startClient(URI.create("ws://" + host + ":" + getPort() + "/nxt"));
+                useWebSocket = webSocket.startClient(URI.create("ws://" + host + ":" + getPort() + "/sharder"));
             //
             // Send the request and process the response
             //
@@ -490,7 +490,7 @@ final class PeerImpl implements Peer {
                         showLog = true;
                     }
                     if (wsResponse.length() > maxResponseSize)
-                        throw new NxtException.NxtIOException("Maximum size exceeded: " + wsResponse.length());
+                        throw new ConchException.NxtIOException("Maximum size exceeded: " + wsResponse.length());
                     response = (JSONObject)JSONValue.parseWithException(wsResponse);
                     updateDownloadedVolume(wsResponse.length());
                 }
@@ -498,7 +498,7 @@ final class PeerImpl implements Peer {
                 //
                 // Send the request using HTTP
                 //
-                URL url = new URL("http://" + host + ":" + getPort() + "/nxt");
+                URL url = new URL("http://" + host + ":" + getPort() + "/sharder");
                 if (communicationLoggingMask != 0)
                     log = "\"" + url.toString() + "\": " + JSON.toString(request);
                 connection = (HttpURLConnection) url.openConnection();
@@ -573,7 +573,7 @@ final class PeerImpl implements Peer {
                     }
                 }
             }
-        } catch (NxtException.NxtIOException e) {
+        } catch (ConchException.NxtIOException e) {
             blacklist(e);
             if (connection != null) {
                 connection.disconnect();
@@ -797,7 +797,7 @@ final class PeerImpl implements Peer {
             }
 
             for (PeerImpl peer : groupedPeers) {
-                peer.adjustedWeight = Constants.MAX_BALANCE_NXT * peer.getHallmarkWeight(mostRecentDate) / totalWeight;
+                peer.adjustedWeight = Constants.MAX_BALANCE_SS * peer.getHallmarkWeight(mostRecentDate) / totalWeight;
                 Peers.notifyListeners(peer, Peers.Event.WEIGHT);
             }
 

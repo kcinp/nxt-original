@@ -38,7 +38,7 @@ public class AddPeer extends APIRequestHandler {
 
     @Override
     protected JSONStreamAware processRequest(HttpServletRequest request)
-            throws NxtException {
+            throws ConchException {
         String peerAddress = Convert.emptyToNull(request.getParameter("peer"));
         if (peerAddress == null) {
             return MISSING_PEER;

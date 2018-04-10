@@ -18,6 +18,7 @@ package nxt.peer;
 
 import nxt.util.Logger;
 import nxt.util.QueuedThreadPool;
+import nxt.util.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeException;
 import org.eclipse.jetty.websocket.api.WebSocketException;

@@ -38,12 +38,12 @@ public final class EncryptedData {
     }
 
     public static EncryptedData readEncryptedData(ByteBuffer buffer, int length, int maxLength)
-            throws NxtException.NotValidException {
+            throws ConchException.NotValidException {
         if (length == 0) {
             return EMPTY_DATA;
         }
         if (length > maxLength) {
-            throw new NxtException.NotValidException("Max encrypted data length exceeded: " + length);
+            throw new ConchException.NotValidException("Max encrypted data length exceeded: " + length);
         }
         byte[] data = new byte[length];
         buffer.get(data);
@@ -60,7 +60,7 @@ public final class EncryptedData {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         try {
             return readEncryptedData(buffer, bytes.length - 32, Integer.MAX_VALUE);
-        } catch (NxtException.NotValidException e) {
+        } catch (ConchException.NotValidException e) {
             throw new RuntimeException(e.toString(), e); // never
         }
     }
